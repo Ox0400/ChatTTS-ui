@@ -125,7 +125,7 @@ def get_lang(text):
     # 使用正则表达式替换所有中文标点为""
     cleaned_text = re.sub(chinese_punctuation, "", text)
     # 使用正则表达式来匹配中文字符范围
-    return "zh" if re.search('[\u4e00-\u9fff]', text) is not None else "en"
+    return "zh" if re.search('[\u4e00-\u9fff]', cleaned_text) is not None else "en"
 
 def fraction_to_words(match):
     numerator, denominator = match.groups()
@@ -183,7 +183,8 @@ def split_text(text_list):
     for i,text in enumerate(text_list):
         tmp=num2text(text)
         if len(tmp)>200:
-            result=result+split_text_by_punctuation(tmp)
+            tmp_res=split_text_by_punctuation(tmp)
+            result=result+tmp_res
         else:
             result.append(tmp)
     print(f'{result=},len={len(result)}')
@@ -210,9 +211,10 @@ def split_text_by_punctuation(text):
                 result.append(text[pos:i+1])
                 # 更新起始位置到当前标点的下一个字符
                 pos = i+1
+    #print(f'{pos=},{len(text)=}')
     
     # 如果剩余文本长度超过120或没有更多标点符号可以进行分割，将剩余的文本作为一个分段添加到结果列表
-    if len(text) - pos > min_length:
+    if pos < len(text):
         result.append(text[pos:])
     
     return result
